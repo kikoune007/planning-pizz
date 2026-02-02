@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion Équipe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800"><i class="fas fa-users-cog mr-2"></i> Gestion de l'équipe</h1>
+        <a href="/" class="text-blue-600 hover:underline">← Retour au planning</a>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-bold mb-4 border-b pb-2">Ajouter un employé</h2>
+        <form action="/admin/employes/ajouter" method="post" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input type="text" name="nom" placeholder="Nom complet" required class="border p-2 rounded">
+            <input type="email" name="email" placeholder="Email" required class="border p-2 rounded">
+            <select name="poste" class="border p-2 rounded">
+                <option value="Sandwich">Sandwich</option>
+                <option value="Pizza">Pizza</option>
+                <option value="Livreur">Livreur</option>
+                <option value="Accueil">Accueil</option>
+                <option value="Manager">Manager</option>
+            </select>
+            <button type="submit" class="bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700">
+                <i class="fas fa-plus"></i> Créer
+            </button>
+        </form>
+        <p class="text-xs text-gray-400 mt-2">* Mot de passe par défaut : "1234"</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-800 text-white">
+            <tr>
+                <th class="px-6 py-3 text-left">Nom</th>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Poste</th>
+                <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            <tr th:each="u : ${employes}" class="hover:bg-gray-50">
+                <td class="px-6 py-4 font-bold" th:text="${u.nom}"></td>
+                <td class="px-6 py-4 text-gray-600" th:text="${u.email}"></td>
+                <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs" th:text="${u.posteDefaut}"></span></td>
+                <td class="px-6 py-4 text-right">
+                    <a th:href="@{/admin/employes/supprimer/{id}(id=${u.id})}"
+                       onclick="return confirm('Sûr de vouloir virer cet employé ?');"
+                       class="text-red-500 hover:text-red-700 font-bold">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

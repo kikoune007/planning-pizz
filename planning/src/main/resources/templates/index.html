@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning Pizz - Accueil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+<nav class="bg-gray-900 text-white p-4 shadow-lg mb-8 sticky top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold text-yellow-500 flex items-center">
+            <i class="fas fa-pizza-slice mr-2"></i> Planning Pizz
+        </h1>
+
+        <div class="space-x-4 flex items-center">
+            <a href="/admin/employes" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded transition border border-gray-600">
+                <i class="fas fa-users mr-1"></i> Équipe
+            </a>
+            <a href="/login" class="text-sm hover:text-yellow-400 transition ml-2">Déconnexion</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mx-auto px-4 pb-12">
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+
+        <div class="flex items-center gap-4 mb-4 md:mb-0">
+            <h2 class="text-xl font-bold text-gray-700"><i class="far fa-calendar-alt mr-2"></i>Planning du :</h2>
+            <form action="/" method="get">
+                <input type="date" name="date"
+                       th:value="${jourActuel}"
+                       onchange="this.form.submit()"
+                       class="border-2 border-gray-300 p-2 rounded font-bold text-gray-700 focus:outline-none focus:border-yellow-500 cursor-pointer hover:bg-gray-50 transition">
+            </form>
+        </div>
+
+        <a href="/ajouter-shift" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-6 py-2 rounded shadow transition transform active:scale-95 flex items-center">
+            <i class="fas fa-plus-circle mr-2"></i> Ajouter un créneau
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-x-auto border border-gray-200 mb-10">
+        <table class="min-w-full divide-y divide-gray-200">
+
+            <thead class="bg-gray-800 text-white">
+            <tr>
+                <th class="px-6 py-4 text-left font-bold uppercase w-56 sticky left-0 bg-gray-800 z-20 shadow-r">
+                    Employé
+                </th>
+                <th th:each="h : ${heures}" class="px-2 py-3 text-center text-xs font-semibold border-l border-gray-700 w-16 min-w-[3rem]">
+                    <span th:text="${h} + 'h'">18h</span>
+                </th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200 bg-white">
+            <tr th:each="user : ${employes}" class="hover:bg-gray-50 transition group">
+
+                <td class="px-6 py-3 whitespace-nowrap border-r border-gray-200 sticky left-0 bg-white z-10 group-hover:bg-gray-50 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 mr-3 font-bold text-lg border border-yellow-200">
+                                <span th:text="${#strings.substring(user.nom,0,1)}">N</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900 text-base" th:text="${user.nom}">Nom</div>
+                                <div class="text-xs text-gray-500 uppercase tracking-wide" th:text="${user.posteDefaut}">Poste</div>
+                            </div>
+                        </div>
+
+                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-md border border-blue-200 ml-2 whitespace-nowrap" title="Total semaine">
+                            Hebdo: <span th:text="${compteurHeures.get(user.id)}">0h</span>
+                        </span>
+                    </div>
+                </td>
+
+                <td th:each="h : ${heures}" class="p-0 border-r border-gray-100 h-16 relative bg-gray-50/30">
+                    <div th:if="${grille.get(user.id).contains(h)}"
+                         class="absolute inset-1 bg-green-500 rounded-md shadow-sm opacity-90 mx-0.5 border border-green-600">
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${employes.empty}" class="p-8 text-center text-gray-500">
+            Aucun employé dans la base. <a href="/admin/employes" class="text-blue-500 underline font-bold">Ajoutez votre équipe ici.</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                <i class="fas fa-list-ul mr-2 text-blue-500"></i> Détails des horaires
+            </h3>
+            <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border">Cliquez sur "Modifier" pour changer un horaire</span>
+        </div>
+
+        <div th:if="${shiftsDuJour.empty}" class="text-center py-10 text-gray-400 bg-white rounded-b-lg">
+            <i class="far fa-calendar-times text-4xl mb-3 block opacity-20"></i>
+            Pas de service prévu pour cette date.
+        </div>
+
+        <table th:unless="${shiftsDuJour.empty}" class="min-w-full">
+            <thead class="bg-white text-gray-500 text-xs uppercase font-bold border-b">
+            <tr>
+                <th class="px-6 py-3 text-left w-1/4">Employé</th>
+                <th class="px-6 py-3 text-left w-1/4">Horaires</th>
+                <th class="px-6 py-3 text-left w-1/6">Poste</th>
+                <th class="px-6 py-3 text-left">Note</th>
+                <th class="px-6 py-3 text-right w-1/6">Action</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+            <tr th:each="s : ${shiftsDuJour}" class="hover:bg-blue-50 transition group">
+                <td class="px-6 py-3 font-bold text-gray-800" th:text="${s.utilisateur.nom}"></td>
+                <td class="px-6 py-3">
+                            <span class="bg-gray-100 px-3 py-1 rounded-full text-sm font-mono border text-gray-700 group-hover:bg-white group-hover:border-blue-200">
+                                <span th:text="${#temporals.format(s.dateDebut, 'HH:mm')}"></span>
+                                <i class="fas fa-arrow-right text-gray-400 text-xs mx-1"></i>
+                                <span th:text="${#temporals.format(s.dateFin, 'HH:mm')}"></span>
+                            </span>
+                </td>
+                <td class="px-6 py-3 text-sm">
+                            <span class="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-100"
+                                  th:text="${s.poste}"></span>
+                </td>
+                <td class="px-6 py-3 text-sm italic text-gray-500" th:text="${s.commentaire}"></td>
+                <td class="px-6 py-3 text-right">
+                    <a th:href="@{/modifier-shift/{id}(id=${s.id})}"
+                       class="text-blue-600 hover:text-white border border-blue-200 hover:bg-blue-600 font-medium text-xs px-3 py-1.5 rounded transition inline-flex items-center">
+                        <i class="fas fa-pen mr-1.5"></i> Modifier
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
